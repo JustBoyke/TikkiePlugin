@@ -17,8 +17,6 @@ public class SqlManager {
 		this.instance = main;
 	}
     
-    
-    public String tabel = db.getConfig().getString("db.tabel");
     public void openConnection() throws SQLException, ClassNotFoundException {
     	db = new DatabaseManager(instance);
     	host = db.getConfig().getString("db.host");
@@ -39,11 +37,13 @@ public class SqlManager {
     }
 }
     
-	public void makeLog(String player, String type, Integer bedrag) {
+	public void makeLog(String player, String type, Integer bedrag, String doelwit) {
+		db = new DatabaseManager(instance);
+		String tabel = db.getConfig().getString("db.tabel");
         try {
             openConnection();
             Statement statement = con.createStatement();   
-            statement.executeUpdate("INSERT INTO " + tabel + " (player, type, bedrag) VALUES ('" + player + "', '" + type + "', '" + bedrag + "');");
+            statement.executeUpdate("INSERT INTO " + tabel + " (player, type, bedrag, doelwit) VALUES ('" + player + "', '" + type + "', '" + bedrag + "','" + doelwit + "');");
             con.close();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();

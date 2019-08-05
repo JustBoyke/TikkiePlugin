@@ -66,7 +66,7 @@ public class Main extends JavaPlugin{
 				}
 				
 				OfflinePlayer op = Bukkit.getOfflinePlayer(args[1]);
-				Integer bedrag = Integer.parseInt(args[2].replaceAll(".", ""));
+				Integer bedrag = Integer.parseInt(args[2]);
 				UUID uuid = op.getUniqueId();
 				
 				if(op.hasPlayedBefore() == false) {
@@ -94,7 +94,7 @@ public class Main extends JavaPlugin{
 				cm.editConfig().set(uuid + ".verzoeken." + sum + ".bedrag", bedrag);
 				cm.editConfig().set(uuid + ".verzoeken." + sum + ".timestamp", format.format(now));
 				cm.save();
-				sql.makeLog(p.getName(), "verzoek verzenden", bedrag);
+				sql.makeLog(p.getName(), "verzoek verzenden", bedrag, op.getName());
 				
 			}
 			
