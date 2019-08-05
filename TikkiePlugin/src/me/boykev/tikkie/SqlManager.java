@@ -39,7 +39,7 @@ public class SqlManager {
     }
 }
     
-	public void makeLog(String player, String type, String bedrag) {
+	public void makeLog(String player, String type, Integer bedrag) {
         try {
             openConnection();
             Statement statement = con.createStatement();   

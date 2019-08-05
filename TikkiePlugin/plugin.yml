@@ -1,0 +1,10 @@
+name: TikkieBETA
+main: me.boykev.tikkie.Main
+author: boykev
+website: http://www.fire-mc.nl
+version: 1.0BETA
+api-version: 1.13
+commands:
+  tikkie:
+    description: Tikkie main command.
+    aliases: [pay, tik]
