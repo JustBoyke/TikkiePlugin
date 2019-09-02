@@ -48,6 +48,7 @@ public void LoadDefaults() {
     config.addDefault("db.username", "root");
     config.addDefault("db.password", "WW HIERO");
     config.addDefault("db.tabel", "TABEL HIERO");
+    config.addDefault("setup.cooldown", 10);
     config.options().copyDefaults(true);
     save();
 	

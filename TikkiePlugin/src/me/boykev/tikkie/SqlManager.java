@@ -37,13 +37,13 @@ public class SqlManager {
     }
 }
     
-	public void makeLog(String player, String type, Integer bedrag, String doelwit) {
+	public void makeLog(String player, String type, Integer bedrag, String doelwit, String id, String flag) {
 		db = new DatabaseManager(instance);
 		String tabel = db.getConfig().getString("db.tabel");
         try {
             openConnection();
             Statement statement = con.createStatement();   
-            statement.executeUpdate("INSERT INTO " + tabel + " (player, type, bedrag, doelwit) VALUES ('" + player + "', '" + type + "', '" + bedrag + "','" + doelwit + "');");
+            statement.executeUpdate("INSERT INTO " + tabel + " (player, type, bedrag, doelwit, TikID, flagged) VALUES ('" + player + "', '" + type + "', '" + bedrag + "','" + doelwit + "', '" + id + "', '" + flag + "');");
             con.close();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
