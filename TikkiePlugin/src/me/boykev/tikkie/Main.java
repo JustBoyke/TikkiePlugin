@@ -15,14 +15,18 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.milkbowl.vault.Vault;
+import net.milkbowl.vault.economy.Economy;
 
 public class Main extends JavaPlugin implements Listener{
 	
+	public Economy economy;
 	
 	@SuppressWarnings("unused")
 	public void onEnable() {
@@ -35,6 +39,14 @@ public class Main extends JavaPlugin implements Listener{
 		cm.save();
 		db.LoadDefaults();
 		db.save();
+		if(Bukkit.getPluginManager().getPlugin("Vault") instanceof Vault)
+    	{
+    		RegisteredServiceProvider<Economy> service = Bukkit.getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+
+    		if(service != null)
+    			economy = service.getProvider();
+    	}
+		
 	}
 	
 	public void onDisable() {
@@ -71,7 +83,7 @@ public class Main extends JavaPlugin implements Listener{
 			
 			if(args[0].equalsIgnoreCase("send")) {
 				if(args.length < 3) {
-					p.sendMessage(ChatColor.RED + "Je hebt niet genoeg argumenten gebruikt: " + ChatColor.GREEN + "/tikkie send [player] [bedrag]");
+					p.sendMessage(this.prefix + ChatColor.RED + "Je hebt niet genoeg argumenten gebruikt: " + ChatColor.GREEN + "/tikkie send [player] [bedrag]");
 					return false;
 				}
 				
@@ -80,20 +92,20 @@ public class Main extends JavaPlugin implements Listener{
 				UUID uuid = op.getUniqueId();
 				
 				if(op.hasPlayedBefore() == false) {
-					p.sendMessage(ChatColor.RED + "Deze speler is niet gevonden!");
+					p.sendMessage(this.prefix + ChatColor.RED + "Deze speler is niet gevonden!");
 					return false;
 				}
 				if(bedrag < 1) {
-					p.sendMessage(ChatColor.RED + "Het minimale tikkie bedrag is 1 euro!");
+					p.sendMessage(this.prefix + ChatColor.RED + "Het minimale tikkie bedrag is 1 euro!");
 					return false;
 				}
 				if(bedrag > 500000) {
-					p.sendMessage(ChatColor.RED + "Het maximale bedrag voor een Tikkie is: 500.000€");
+					p.sendMessage(this.prefix + ChatColor.RED + "Het maximale bedrag voor een Tikkie is: 500.000€");
 					return false;
 				}
 				
 				if(!p.hasPermission("tikkie.send")) {
-					p.sendMessage("Oeps, tikkie is nog niet beschikbaar voor jouw");
+					p.sendMessage(this.prefix + "Oeps, tikkie is nog niet beschikbaar voor jouw");
 					return false;
 				}
 				
@@ -108,8 +120,6 @@ public class Main extends JavaPlugin implements Listener{
 				Date now = new Date();
 				SimpleDateFormat format = new SimpleDateFormat("dd-MM-YYYY HH:mm:ss");
 				
-				int min = 2000;
-				int max = 9000;
 				Random r = new Random();
 				int rand = r.nextInt(9000);
 				
@@ -134,9 +144,9 @@ public class Main extends JavaPlugin implements Listener{
 		        	sql.makeLog(p.getName(), "verzoek verzenden ", bedrag, op.getName(), lastlog, "JA");
 		        }
 		        cooldown.put(p.getName(), System.currentTimeMillis());
-		        p.sendMessage(ChatColor.GREEN + "verzoek voor betalen van " + ChatColor.GRAY + bedrag + ChatColor.GREEN + "€ verzonden naar: " + ChatColor.GRAY + op.getName());
+		        p.sendMessage(this.prefix + ChatColor.GREEN + "verzoek voor betalen van " + ChatColor.GRAY + bedrag + ChatColor.GREEN + "€ verzonden naar: " + ChatColor.GRAY + op.getName());
 		        if(op.isOnline()) {
-		        	op.getPlayer().sendMessage(ChatColor.RED + "Je hebt een tikkie ontvangen van: " + ChatColor.GRAY + p.getName() + ChatColor.RED + " ter waarde van: " + ChatColor.GRAY + bedrag + "€");
+		        	op.getPlayer().sendMessage(this.prefix + ChatColor.RED + "Je hebt een tikkie ontvangen van: " + ChatColor.GRAY + p.getName() + ChatColor.RED + " ter waarde van: " + ChatColor.GRAY + bedrag + "€");
 		        }
 		        return false;
 				
@@ -146,7 +156,7 @@ public class Main extends JavaPlugin implements Listener{
 				String uuid = p.getUniqueId().toString();
 				if(args.length < 2) {
 					if(cm.getConfig().getConfigurationSection(uuid + ".verzoeken") == null) {
-						p.sendMessage(ChatColor.RED + "Jij hebt nog nooit verzoeken ontvangen!");
+						p.sendMessage(this.prefix + ChatColor.RED + "Jij hebt nog nooit verzoeken ontvangen!");
 						return false;
 					}
 					for(String key : cm.getConfig().getConfigurationSection(uuid + ".verzoeken").getKeys(false)) {
@@ -172,14 +182,14 @@ public class Main extends JavaPlugin implements Listener{
 					p.sendMessage(ChatColor.GREEN + "Tikkie ID: " + ChatColor.GRAY + tid);
 					return false;
 				}
-				p.sendMessage(ChatColor.RED + "Dit verzoek is niet gevonden in je account!");
+				p.sendMessage(this.prefix + ChatColor.RED + "Dit verzoek is niet gevonden in je account!");
 				return false;
 			}
 			
 			if(args[0].equalsIgnoreCase("pay")) {	
 				String uuid = p.getUniqueId().toString();
 				if(!p.hasPermission("tikkie.pay")) {
-					p.sendMessage("Oeps, jij kan nog niet betalen met tikkie!");
+					p.sendMessage(this.prefix + "Oeps, jij kan nog niet betalen met tikkie!");
 					return false;
 				}
 				if(args.length < 2) {
@@ -188,6 +198,7 @@ public class Main extends JavaPlugin implements Listener{
 				}
 				String tid = args[1];
 				if(cm.getConfig().getConfigurationSection(uuid + ".verzoeken." + tid) != null) {
+					@SuppressWarnings("unused")
 					OfflinePlayer player = Bukkit.getOfflinePlayer(cm.getConfig().getString(uuid + ".verzoeken." + tid + ".Player"));
 					String afzender = ChatColor.GRAY + cm.getConfig().getString(uuid + ".verzoeken." + tid + ".Player") + ChatColor.RED;
 					String bedrag = ChatColor.GRAY + cm.getConfig().getString(uuid + ".verzoeken." + tid + ".bedrag") + "€ "+ ChatColor.RED;
@@ -207,7 +218,7 @@ public class Main extends JavaPlugin implements Listener{
 				String tid = args[1];
 				
 				if(cm.getConfig().getConfigurationSection(uuid + ".verzoeken." + tid) == null) {
-					p.sendMessage(ChatColor.RED + "Deze betaling kon niet worden bevestigd omdat hij niet is gevonden in je account!");
+					p.sendMessage(this.prefix + ChatColor.RED + "Deze betaling kon niet worden bevestigd omdat hij niet is gevonden in je account!");
 					return false;
 				}
 				
@@ -217,10 +228,20 @@ public class Main extends JavaPlugin implements Listener{
 				int money = cm.getConfig().getInt(uuid + ".verzoeken." + tid + ".bedrag");
 				
 				
-				//vault check money and run payment
+				if(economy.getBalance(p.getPlayer()) < money) {
+					p.sendMessage(this.prefix + ChatColor.RED + "Je hebt niet genoeg geld om deze tikkie te kunnen betalen!");
+					return false;
+				}
+				economy.depositPlayer(player, money);
+				economy.withdrawPlayer(p, money);
+				
+				if(player.isOnline()) {
+					player.getPlayer().sendMessage(this.prefix + ChatColor.GRAY + p.getName() + ChatColor.GREEN + " heeft een tikkie overgemaakt van: " + bedrag);
+		        }
 				
 				
-				p.sendMessage(ChatColor.RED + "Betaling van " + bedrag + "gedaan aan speler: " + afzender);
+				
+				p.sendMessage(this.prefix + ChatColor.RED + "Betaling van " + bedrag + "gedaan aan speler: " + afzender);
 				cm.editConfig().set(uuid + ".verzoeken." + tid, null);
 				if(money < 1000) {
 		        	sql.makeLog(p.getName(), "verzoek verzenden ", money, player.getName(), tid, "NEE");
