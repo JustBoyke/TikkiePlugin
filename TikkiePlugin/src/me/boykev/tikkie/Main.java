@@ -252,12 +252,63 @@ public class Main extends JavaPlugin implements Listener{
 				cm.save();
 				return false;
 			}
-			
+			if(args[0].equalsIgnoreCase("remove")) {
+				if(!p.hasPermission("tikkie.admin")) {
+					p.sendMessage(this.prefix + ChatColor.RED + "Dit commando is alleen voor mensen met de permissie: " + ChatColor.GRAY + "tikkie.admin");
+					return false;
+				}
+				if(args.length < 3) {
+					p.sendMessage(ChatColor.RED + "gebruik /tikkie remove [player] [id]");
+					return false;
+				}
+				
+				OfflinePlayer op = Bukkit.getOfflinePlayer(args[1]);
+				String id = args[2];
+				
+				if(cm.getConfig().getConfigurationSection(op.getUniqueId().toString() + ".verzoeken." + id) == null) {
+					p.sendMessage(this.prefix + ChatColor.RED + "Dit ID is niet gevonden op het account van " + ChatColor.GRAY + op.getName() + " (" + op.getUniqueId().toString() + ")");
+					return false;
+				}
+				int money = cm.getConfig().getInt(p.getUniqueId().toString() + ".verzoeken." + id + ".bedrag");
+				sql.makeLog(p.getName(), "verzoek verwijderd door admin ", money, op.getName(), id, "n.v.t");
+				cm.editConfig().set(op.getUniqueId().toString() + ".verzoeken." + id, null);
+				cm.save();
+				p.sendMessage(this.prefix + ChatColor.RED + "Tikkie met onderstaande gevens is verwijderd:");
+				p.sendMessage(ChatColor.GREEN + "Player: " + ChatColor.GRAY + op.getName());
+				p.sendMessage(ChatColor.GREEN + "UUID: " + ChatColor.GRAY + op.getUniqueId().toString());
+				p.sendMessage(ChatColor.GREEN + "Verzoek ID: " + ChatColor.GRAY + id);
+				
+				if(op.isOnline()) {
+					op.getPlayer().sendMessage(this.prefix + ChatColor.RED + "Een administrator heeft je tikkie met ID: " + ChatColor.GRAY + id + ChatColor.RED + " verwijderd uit je account!");
+				}
+				return false;
+			}
+			if(args[0].equalsIgnoreCase("deny")) {
+				if(args.length < 2) {
+					p.sendMessage(ChatColor.RED + "gebruik /tikkie deny [id]");
+					return false;
+				}
+				
+				String id = args[1];
+				
+				if(cm.getConfig().getConfigurationSection(p.getUniqueId().toString() + ".verzoeken." + id) == null) {
+					p.sendMessage(this.prefix + ChatColor.RED + "Dit verzoek is niet gevonden in je account!");
+					return false;
+				}
+				
+				OfflinePlayer player = Bukkit.getOfflinePlayer(cm.getConfig().getString(p.getUniqueId().toString() + ".verzoeken." + id + ".Player"));
+				int money = cm.getConfig().getInt(p.getUniqueId().toString() + ".verzoeken." + id + ".bedrag");
+				sql.makeLog(p.getName(), "verzoek afgewezen ", money, player.getName(), id, "n.v.t");
+				
+				cm.editConfig().set(p.getUniqueId().toString() + ".verzoeken." + id, null);
+				cm.save();
+				p.sendMessage(this.prefix + ChatColor.RED + "Tikkie met onderstaande gevens is afgewezen:");
+				p.sendMessage(ChatColor.GREEN + "Player: " + ChatColor.GRAY + p.getName());
+				p.sendMessage(ChatColor.GREEN + "UUID: " + ChatColor.GRAY + p.getUniqueId().toString());
+				p.sendMessage(ChatColor.GREEN + "Verzoek ID: " + ChatColor.GRAY + id);
+				return false;
+			}
 		}
-		
-		
-		
-		
 		return false;
 	}
 
