@@ -244,10 +244,10 @@ public class Main extends JavaPlugin implements Listener{
 				p.sendMessage(this.prefix + ChatColor.RED + "Betaling van " + bedrag + "gedaan aan speler: " + afzender);
 				cm.editConfig().set(uuid + ".verzoeken." + tid, null);
 				if(money < 1000) {
-		        	sql.makeLog(p.getName(), "verzoek verzenden ", money, player.getName(), tid, "NEE");
+		        	sql.makeLog(p.getName(), "verzoek betaald ", money, player.getName(), tid, "NEE");
 		        }
 		        if(money > 1000) {
-		        	sql.makeLog(p.getName(), "verzoek verzenden ", money, player.getName(), tid, "JA");
+		        	sql.makeLog(p.getName(), "verzoek betaald ", money, player.getName(), tid, "JA");
 		        }
 				cm.save();
 				return false;
