@@ -33,7 +33,7 @@ public class Main extends JavaPlugin implements Listener{
 		PluginManager pm = Bukkit.getPluginManager();
 		db = new DatabaseManager(this);
 		cm = new PrivateConfigManager(this);
-		System.out.println(ChatColor.GREEN + "TikkieV0.5 is opgestart!");
+		System.out.println(ChatColor.GREEN + "Tikkie ALPHA is opgestart!");
 		Bukkit.getPluginManager().registerEvents(this, this);
 		cm.LoadDefaults();
 		cm.save();
